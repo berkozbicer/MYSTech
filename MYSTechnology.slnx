@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="MYSTech.API/MYSTech.API.csproj" />
+  <Project Path="MYSTech.Business/MYSTech.Business.csproj" />
+  <Project Path="MYSTech.DataAccess/MYSTech.DataAccess.csproj" />
+  <Project Path="MYSTech.DTO/MYSTech.DTO.csproj" />
+  <Project Path="MYSTech.Entity/MYSTech.Entity.csproj" />
+  <Project Path="MYSTech.WebUI/MYSTech.WebUI.csproj" />
+</Solution>
