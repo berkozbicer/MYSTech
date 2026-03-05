@@ -1,29 +1,33 @@
 using Microsoft.EntityFrameworkCore;
-using MYSTech.Business.Services;
+using Microsoft.Extensions.DependencyInjection;
+using MYSTech.Business.Abstract;
+using MYSTech.Business.Concrete;
+using MYSTech.DataAccess.Abstract;
 using MYSTech.DataAccess.Context;
 using MYSTech.DataAccess.Repositories;
-using MYSTech.DataAccess.UnitOfWork;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add services to the container
+builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+builder.Services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped(typeof(IGenericService<>), typeof(GenericManager<>));
 builder.Services.AddDbContext<MYSTechContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection")));
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection"));
+});
 builder.Services.AddControllers();
-builder.Services.AddScoped<IUnitOfWork, EfUnitOfWork>();
-builder.Services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
-builder.Services.AddScoped<IUnitOfWork, EfUnitOfWork>();
-builder.Services.AddScoped<ProductService>();
-builder.Services.AddScoped<BannerService>();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
