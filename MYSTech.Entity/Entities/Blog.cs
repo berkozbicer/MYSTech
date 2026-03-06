@@ -4,7 +4,7 @@ using System.Text;
 
 namespace MYSTech.Entity.Entities
 {
-    public class Blog
+    public class Blog : BaseEntity
     {
         public int BlogId { get; set; }
 
@@ -20,8 +20,6 @@ namespace MYSTech.Entity.Entities
         public string MetaDescription { get; set; }
 
         public bool IsPublished { get; set; }
-        public DateTime BlogCreatedDate { get; set; } = DateTime.UtcNow;
-        public DateTime? BlogUpdatedDate { get; set; }
 
         public int BlogCategoryId { get; set; }
         public BlogCategory BlogCategory { get; set; }

@@ -11,18 +11,55 @@ namespace MYSTech.DataAccess.Configurations
     {
         public void Configure(EntityTypeBuilder<ProductImage> builder)
         {
-            builder.HasKey(x => x.ProductImageId);
+            builder.HasKey(pi => pi.ProductImageId);
 
-            builder.Property(x => x.ImageUrl)
-                   .IsRequired()
-                   .HasMaxLength(500);
+            builder.Property(pi => pi.ProductImageId)
+                .ValueGeneratedOnAdd();
 
-            builder.HasOne(x => x.Product)
-                   .WithMany(p => p.ProductImages)
-                   .HasForeignKey(x => x.ProductId)
-                   .OnDelete(DeleteBehavior.Cascade);
+            builder.Property(pi => pi.ImageUrl)
+                .IsRequired()
+                .HasMaxLength(500);
 
-            builder.HasQueryFilter(x => !x.IsDeleted);
+            builder.Property(pi => pi.IsMain)
+                .IsRequired()
+                .HasDefaultValue(false);
+
+            builder.Property(pi => pi.Order)
+                .IsRequired()
+                .HasDefaultValue(0);
+
+            builder.HasOne(pi => pi.Product)
+                .WithMany(p => p.ProductImages)
+                .HasForeignKey(pi => pi.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // BaseEntity fields
+            builder.Property(pi => pi.CreatedDate)
+                .IsRequired();
+
+            builder.Property(pi => pi.CreatedBy)
+                .HasMaxLength(100);
+
+            builder.Property(pi => pi.UpdatedDate);
+
+            builder.Property(pi => pi.UpdatedBy)
+                .HasMaxLength(100);
+
+            builder.Property(pi => pi.IsDeleted)
+                .IsRequired()
+                .HasDefaultValue(false);
+
+            builder.Property(pi => pi.DeletedDate);
+
+            builder.Property(pi => pi.DeletedBy)
+                .HasMaxLength(100);
+
+            builder.Property(pi => pi.RowVersion)
+                .IsRowVersion();
+
+            builder.HasQueryFilter(pi => !pi.IsDeleted);
+
+            builder.ToTable("ProductImages");
         }
     }
 }

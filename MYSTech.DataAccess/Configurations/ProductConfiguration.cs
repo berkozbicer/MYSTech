@@ -11,40 +11,96 @@ namespace MYSTech.DataAccess.Configurations
     {
         public void Configure(EntityTypeBuilder<Product> builder)
         {
-            builder.HasKey(x => x.ProductId);
+            builder.HasKey(p => p.ProductId);
 
-            builder.Property(x => x.ProductName)
-                   .IsRequired()
-                   .HasMaxLength(200);
+            builder.Property(p => p.ProductId)
+                .ValueGeneratedOnAdd();
 
-            builder.Property(x => x.Slug)
-                   .IsRequired()
-                   .HasMaxLength(250);
+            builder.Property(p => p.ProductName)
+                .IsRequired()
+                .HasMaxLength(300);
 
-            builder.HasIndex(x => x.Slug).IsUnique();
+            builder.Property(p => p.Slug)
+                .IsRequired()
+                .HasMaxLength(300);
 
-            builder.Property(x => x.Price)
-                   .HasColumnType("decimal(18,2)");
+            builder.HasIndex(p => p.Slug)
+                .IsUnique();
 
-            builder.Property(x => x.DiscountPrice)
-                   .HasColumnType("decimal(18,2)");
+            builder.Property(p => p.ShortDescription)
+                .HasMaxLength(500);
 
-            builder.HasOne(x => x.Category)
-                   .WithMany(c => c.Products)
-                   .HasForeignKey(x => x.CategoryId)
-                   .OnDelete(DeleteBehavior.Restrict);
+            builder.Property(p => p.FullDescription)
+                .IsRequired();
 
-            builder.HasMany(x => x.ProductImages)
-                   .WithOne(p => p.Product)
-                   .HasForeignKey(p => p.ProductId)
-                   .OnDelete(DeleteBehavior.Cascade);
+            builder.Property(p => p.Price)
+                .IsRequired()
+                .HasColumnType("decimal(18,2)");
 
-            builder.HasMany(x => x.ProductFeatures)
-                   .WithOne(p => p.Product)
-                   .HasForeignKey(p => x.ProductId)
-                   .OnDelete(DeleteBehavior.Cascade);
+            builder.Property(p => p.DiscountPrice)
+                .HasColumnType("decimal(18,2)");
 
-            builder.HasQueryFilter(x => !x.IsDeleted);
+            builder.Property(p => p.StockQuantity)
+                .IsRequired()
+                .HasDefaultValue(0);
+
+            builder.Property(p => p.IsHomeShown)
+                .IsRequired()
+                .HasDefaultValue(false);
+
+            builder.Property(p => p.MetaTitle)
+                .IsRequired()
+                .HasMaxLength(200);
+
+            builder.Property(p => p.MetaDescription)
+                .HasMaxLength(500);
+
+            builder.Property(p => p.IsActive)
+                .IsRequired()
+                .HasDefaultValue(true);
+
+            builder.HasOne(p => p.Category)
+                .WithMany(c => c.Products)
+                .HasForeignKey(p => p.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasMany(p => p.ProductImages)
+                .WithOne(pi => pi.Product)
+                .HasForeignKey(pi => pi.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(p => p.ProductFeatures)
+                .WithOne(pf => pf.Product)
+                .HasForeignKey(pf => pf.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // BaseEntity fields
+            builder.Property(p => p.CreatedDate)
+                .IsRequired();
+
+            builder.Property(p => p.CreatedBy)
+                .HasMaxLength(100);
+
+            builder.Property(p => p.UpdatedDate);
+
+            builder.Property(p => p.UpdatedBy)
+                .HasMaxLength(100);
+
+            builder.Property(p => p.IsDeleted)
+                .IsRequired()
+                .HasDefaultValue(false);
+
+            builder.Property(p => p.DeletedDate);
+
+            builder.Property(p => p.DeletedBy)
+                .HasMaxLength(100);
+
+            builder.Property(p => p.RowVersion)
+                .IsRowVersion();
+
+            builder.HasQueryFilter(p => !p.IsDeleted);
+
+            builder.ToTable("Products");
         }
     }
 }

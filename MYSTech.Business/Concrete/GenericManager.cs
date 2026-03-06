@@ -50,7 +50,7 @@ namespace MYSTech.Business.Concrete
 
         public List<T> TGetList()
         {
-            throw new NotImplementedException();
+            return _repository.GetList();
         }
 
         public void TUpdate(T entity)

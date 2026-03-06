@@ -11,22 +11,75 @@ namespace MYSTech.DataAccess.Configurations
     {
         public void Configure(EntityTypeBuilder<Banner> builder)
         {
-            builder.HasKey(x => x.BannerId);
+            builder.HasKey(b => b.BannerId);
 
-            builder.Property(x => x.Title)
-                   .IsRequired()
-                   .HasMaxLength(200);
+            builder.Property(b => b.BannerId)
+                .ValueGeneratedOnAdd();
 
-            builder.Property(x => x.SubTitle)
-                   .HasMaxLength(500);
+            builder.Property(b => b.Title)
+                .IsRequired()
+                .HasMaxLength(200);
 
-            builder.Property(x => x.ButtonText)
-                   .HasMaxLength(50);
+            builder.Property(b => b.SubTitle)
+                .IsRequired()
+                .HasMaxLength(400);
 
-            builder.Property(x => x.ButtonLink)
-                   .HasMaxLength(250);
+            builder.Property(b => b.ImageUrl)
+                .IsRequired()
+                .HasMaxLength(500);
 
-            builder.HasQueryFilter(x => !x.IsDeleted);
+            builder.Property(b => b.MobileImageUrl)
+                .IsRequired()
+                .HasMaxLength(500);
+
+            builder.Property(b => b.ButtonText)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            builder.Property(b => b.ButtonLink)
+                .IsRequired()
+                .HasMaxLength(500);
+
+            builder.Property(b => b.Order)
+                .IsRequired();
+
+            builder.Property(b => b.IsActive)
+                .IsRequired()
+                .HasDefaultValue(true);
+
+            builder.Property(b => b.VideoUrl)
+                .HasMaxLength(500);
+
+            builder.Property(b => b.BackgroundColor)
+                .HasMaxLength(50);
+
+            // BaseEntity fields
+            builder.Property(b => b.CreatedDate)
+                .IsRequired();
+
+            builder.Property(b => b.CreatedBy)
+                .HasMaxLength(100);
+
+            builder.Property(b => b.UpdatedDate);
+
+            builder.Property(b => b.UpdatedBy)
+                .HasMaxLength(100);
+
+            builder.Property(b => b.IsDeleted)
+                .IsRequired()
+                .HasDefaultValue(false);
+
+            builder.Property(b => b.DeletedDate);
+
+            builder.Property(b => b.DeletedBy)
+                .HasMaxLength(100);
+
+            builder.Property(b => b.RowVersion)
+                .IsRowVersion();
+
+            builder.HasQueryFilter(b => !b.IsDeleted);
+
+            builder.ToTable("Banners");
         }
     }
 }

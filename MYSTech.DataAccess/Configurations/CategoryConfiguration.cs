@@ -11,24 +11,78 @@ namespace MYSTech.DataAccess.Configurations
     {
         public void Configure(EntityTypeBuilder<Category> builder)
         {
-            builder.HasKey(x => x.CategoryId);
+            builder.HasKey(c => c.CategoryId);
 
-            builder.Property(x => x.CategoryName)
-                   .IsRequired()
-                   .HasMaxLength(150);
+            builder.Property(c => c.CategoryId)
+                .ValueGeneratedOnAdd();
 
-            builder.Property(x => x.Slug)
-                   .IsRequired()
-                   .HasMaxLength(200);
+            builder.Property(c => c.CategoryName)
+                .IsRequired()
+                .HasMaxLength(200);
 
-            builder.HasIndex(x => x.Slug).IsUnique();
+            builder.Property(c => c.Slug)
+                .IsRequired()
+                .HasMaxLength(200);
 
-            builder.HasOne(x => x.ParentCategory)
-                   .WithMany(x => x.SubCategories)
-                   .HasForeignKey(x => x.ParentCategoryId)
-                   .OnDelete(DeleteBehavior.Restrict);
+            builder.HasIndex(c => c.Slug)
+                .IsUnique();
 
-            builder.HasQueryFilter(x => !x.IsDeleted);
+            builder.Property(c => c.Icon)
+                .IsRequired()
+                .HasMaxLength(200);
+
+            builder.Property(c => c.Description)
+                .IsRequired()
+                .HasMaxLength(1000);
+
+            builder.Property(c => c.IsShown)
+                .IsRequired()
+                .HasDefaultValue(true);
+
+            builder.Property(c => c.MetaTitle)
+                .IsRequired()
+                .HasMaxLength(200);
+
+            builder.Property(c => c.MetaDescription)
+                .IsRequired()
+                .HasMaxLength(500);
+
+            builder.Property(c => c.ParentCategoryId);
+
+            // Self-referencing ilişki (Ana & Alt Kategori)
+            builder.HasOne(c => c.ParentCategory)
+                .WithMany(c => c.SubCategories)
+                .HasForeignKey(c => c.ParentCategoryId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .IsRequired(false);
+
+            // BaseEntity fields
+            builder.Property(c => c.CreatedDate)
+                .IsRequired();
+
+            builder.Property(c => c.CreatedBy)
+                .HasMaxLength(100);
+
+            builder.Property(c => c.UpdatedDate);
+
+            builder.Property(c => c.UpdatedBy)
+                .HasMaxLength(100);
+
+            builder.Property(c => c.IsDeleted)
+                .IsRequired()
+                .HasDefaultValue(false);
+
+            builder.Property(c => c.DeletedDate);
+
+            builder.Property(c => c.DeletedBy)
+                .HasMaxLength(100);
+
+            builder.Property(c => c.RowVersion)
+                .IsRowVersion();
+
+            builder.HasQueryFilter(c => !c.IsDeleted);
+
+            builder.ToTable("Categories");
         }
     }
 }

@@ -4,9 +4,8 @@ using System.Text;
 
 namespace MYSTech.Entity.Entities
 {
-    public class Testimonial
+    public class Testimonial : BaseEntity
     {
-        // Yapılan iş Referansları için oluşturulan tablo
         public int TestimonialId { get; set; }
 
         public string TestimonialName { get; set; }
@@ -16,5 +15,7 @@ namespace MYSTech.Entity.Entities
         public string TestimonialDescription { get; set; }
 
         public string TestimonialImageUrl { get; set; }
+
+        public bool IsActive { get; set; } = true;
     }
 }

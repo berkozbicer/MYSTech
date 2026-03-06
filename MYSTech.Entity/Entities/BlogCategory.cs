@@ -1,6 +1,6 @@
 ﻿namespace MYSTech.Entity.Entities
 {
-    public class BlogCategory
+    public class BlogCategory : BaseEntity
     {
         public int BlogCategoryId { get; set; }
         public string Name { get; set; }

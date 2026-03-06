@@ -4,7 +4,7 @@ using System.Text;
 
 namespace MYSTech.Entity.Entities
 {
-    public class SocialMedia
+    public class SocialMedia : BaseEntity
     {
         public int SocialMediaId { get; set; }
 
@@ -13,5 +13,7 @@ namespace MYSTech.Entity.Entities
         public string Url { get; set; }
 
         public string Title { get; set; }
+
+        public bool IsActive { get; set; } = true;
     }
 }

@@ -11,22 +11,51 @@ namespace MYSTech.DataAccess.Configurations
     {
         public void Configure(EntityTypeBuilder<ProductFeature> builder)
         {
-            builder.HasKey(x => x.ProductFeatureId);
+            builder.HasKey(pf => pf.ProductFeatureId);
 
-            builder.Property(x => x.Key)
-                   .IsRequired()
-                   .HasMaxLength(150);
+            builder.Property(pf => pf.ProductFeatureId)
+                .ValueGeneratedOnAdd();
 
-            builder.Property(x => x.Value)
-                   .IsRequired()
-                   .HasMaxLength(500);
+            builder.Property(pf => pf.Key)
+                .IsRequired()
+                .HasMaxLength(200);
 
-            builder.HasOne(x => x.Product)
-                   .WithMany(p => p.ProductFeatures)
-                   .HasForeignKey(x => x.ProductId)
-                   .OnDelete(DeleteBehavior.Cascade);
+            builder.Property(pf => pf.Value)
+                .IsRequired()
+                .HasMaxLength(500);
 
-            builder.HasQueryFilter(x => !x.IsDeleted);
+            builder.HasOne(pf => pf.Product)
+                .WithMany(p => p.ProductFeatures)
+                .HasForeignKey(pf => pf.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // BaseEntity fields
+            builder.Property(pf => pf.CreatedDate)
+                .IsRequired();
+
+            builder.Property(pf => pf.CreatedBy)
+                .HasMaxLength(100);
+
+            builder.Property(pf => pf.UpdatedDate);
+
+            builder.Property(pf => pf.UpdatedBy)
+                .HasMaxLength(100);
+
+            builder.Property(pf => pf.IsDeleted)
+                .IsRequired()
+                .HasDefaultValue(false);
+
+            builder.Property(pf => pf.DeletedDate);
+
+            builder.Property(pf => pf.DeletedBy)
+                .HasMaxLength(100);
+
+            builder.Property(pf => pf.RowVersion)
+                .IsRowVersion();
+
+            builder.HasQueryFilter(pf => !pf.IsDeleted);
+
+            builder.ToTable("ProductFeatures");
         }
     }
 }

@@ -2,16 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MYSTech.Entity.Entities
+namespace MYSTech.DTO.DTOs.AboutDTOs
 {
-    public class About : BaseEntity
+    public class CreateAboutDto
     {
-        public int AboutId { get; set; }
 
         public string Description { get; set; }
 
         public string ImageUrl { get; set; }
-
-
     }
 }
