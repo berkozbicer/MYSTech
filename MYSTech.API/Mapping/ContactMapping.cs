@@ -6,10 +6,11 @@ namespace MYSTech.API.Mapping
 {
     public class ContactMapping : Profile
     {
-        public ContactMapping() 
+        public ContactMapping()
         {
-            CreateMap<Contact, CreateContactDto>().ReverseMap();
-            CreateMap<Contact, UpdateContactDto>().ReverseMap();
+            CreateMap<Contact, ResultContactDto>();
+            CreateMap<CreateContactDto, Contact>();
+            CreateMap<UpdateContactDto, Contact>();
         }
     }
 }

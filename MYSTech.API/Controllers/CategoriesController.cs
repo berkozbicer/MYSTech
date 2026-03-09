@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MYSTech.API.Models;
 using MYSTech.Business.Abstract;
 using MYSTech.DTO.DTOs.CategoryDTOs;
 using MYSTech.Entity.Entities;
@@ -9,47 +11,100 @@ namespace MYSTech.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CategoriesController(IGenericService<Category> _categoryService, IMapper _mapper) : ControllerBase
+    [Produces("application/json")]
+    public class CategoriesController(ICategoryService _categoryService) : ControllerBase
     {
         [HttpGet]
-        public IActionResult Get()
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(ApiResponse<List<ResultCategoryDto>>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetList()
         {
-            var categories = _categoryService.TGetList();
-            return Ok(categories);
+            var categories = await _categoryService.TGetListAsync();
+            return Ok(ApiResponse<List<ResultCategoryDto>>.SuccessResponse(categories));
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(ApiResponse<ResultCategoryDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetById(int id)
         {
-            var category = _categoryService.TGetById(id);
+            var category = await _categoryService.TGetByIdAsync(id);
             if (category == null)
-            {
-                return NotFound();
-            }
-            return Ok(category);
+                return NotFound(ApiResponse<object>.FailResponse("Kayıt bulunamadı."));
+            return Ok(ApiResponse<ResultCategoryDto>.SuccessResponse(category));
         }
 
-        [HttpDelete]
-        public IActionResult Delete(int id)
+        [HttpGet("{id}/with-subs")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(ApiResponse<ResultCategoryWithSubsDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetWithSubCategories(int id)
         {
-            _categoryService.TDelete(id);
-            return Ok("Kategori Silindi");
+            var category = await _categoryService.TGetWithSubCategoriesAsync(id);
+            if (category == null)
+                return NotFound(ApiResponse<object>.FailResponse("Kayıt bulunamadı."));
+            return Ok(ApiResponse<ResultCategoryWithSubsDto>.SuccessResponse(category));
+        }
+
+        [HttpGet("main")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(ApiResponse<List<ResultCategoryDto>>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetMainCategories()
+        {
+            var categories = await _categoryService.TGetMainCategoriesAsync();
+            return Ok(ApiResponse<List<ResultCategoryDto>>.SuccessResponse(categories));
+        }
+
+        [HttpGet("{parentId}/subs")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(ApiResponse<List<ResultCategoryDto>>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetSubCategories(int parentId)
+        {
+            var categories = await _categoryService.TGetSubCategoriesAsync(parentId);
+            return Ok(ApiResponse<List<ResultCategoryDto>>.SuccessResponse(categories));
+        }
+
+        [HttpGet("slug/{slug}")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(ApiResponse<ResultCategoryDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetBySlug(string slug)
+        {
+            var category = await _categoryService.TGetBySlugAsync(slug);
+            if (category == null)
+                return NotFound(ApiResponse<object>.FailResponse("Kayıt bulunamadı."));
+            return Ok(ApiResponse<ResultCategoryDto>.SuccessResponse(category));
         }
 
         [HttpPost]
-        public IActionResult Create(CreateCategoryDto createCategoryDto)
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Create(CreateCategoryDto createCategoryDto)
         {
-            var newCategory = _mapper.Map<Category>(createCategoryDto);
-            _categoryService.TCreate(newCategory);
-            return Ok("Kategori Oluşturuldu");
+            await _categoryService.TCreateAsync(createCategoryDto);
+            return Ok(ApiResponse<object>.SuccessResponse(null, "Kategori oluşturuldu."));
         }
 
         [HttpPut]
-        public IActionResult Update(UpdateCategoryDto updateCategoryDto)
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Update(UpdateCategoryDto updateCategoryDto)
         {
-            var existingCategory = _mapper.Map<Category>(updateCategoryDto);
-            _categoryService.TUpdate(existingCategory);
-            return Ok("Kategori Güncellendi");
+            await _categoryService.TUpdateAsync(updateCategoryDto);
+            return Ok(ApiResponse<object>.SuccessResponse(null, "Kategori güncellendi."));
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Delete(int id)
+        {
+            await _categoryService.TDeleteAsync(id);
+            return Ok(ApiResponse<object>.SuccessResponse(null, "Kategori silindi."));
         }
     }
 }

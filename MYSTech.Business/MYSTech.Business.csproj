@@ -7,7 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="16.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\MYSTech.DataAccess\MYSTech.DataAccess.csproj" />
+    <ProjectReference Include="..\MYSTech.DTO\MYSTech.DTO.csproj" />
   </ItemGroup>
 
 </Project>

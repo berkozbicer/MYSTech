@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MYSTech.API.Models;
 using MYSTech.Business.Abstract;
 using MYSTech.DTO.DTOs.AboutDTOs;
 using MYSTech.DTO.DTOs.BannerDTOs;
@@ -10,47 +12,70 @@ namespace MYSTech.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AboutsController(IGenericService<About> _aboutService, IMapper _mapper) : ControllerBase
+    [Produces("application/json")]
+    public class AboutsController(IAboutService _aboutService) : ControllerBase
     {
         [HttpGet]
-        public IActionResult Get()
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(ApiResponse<List<ResultAboutDto>>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetList()
         {
-            var abouts = _aboutService.TGetList();
-            return Ok(abouts);
+            var abouts = await _aboutService.TGetListAsync();
+            return Ok(ApiResponse<List<ResultAboutDto>>.SuccessResponse(abouts));
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(ApiResponse<ResultAboutDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetById(int id)
         {
-            var about = _aboutService.TGetById(id);
+            var about = await _aboutService.TGetByIdAsync(id);
             if (about == null)
-            {
-                return NotFound();
-            }
-            return Ok(about);
+                return NotFound(ApiResponse<object>.FailResponse("Kayıt bulunamadı."));
+            return Ok(ApiResponse<ResultAboutDto>.SuccessResponse(about));
         }
 
-        [HttpDelete]
-        public IActionResult Delete(int id)
+        [HttpGet("first")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(ApiResponse<ResultAboutDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetFirst()
         {
-            _aboutService.TDelete(id);
-            return Ok("Hakkında Bilgisi Silindi");
+            var about = await _aboutService.TGetFirstAsync();
+            if (about == null)
+                return NotFound(ApiResponse<object>.FailResponse("Kayıt bulunamadı."));
+            return Ok(ApiResponse<ResultAboutDto>.SuccessResponse(about));
         }
 
         [HttpPost]
-        public IActionResult Create(CreateAboutDto createAboutDto)
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Create(CreateAboutDto createAboutDto)
         {
-            var newAbout = _mapper.Map<About>(createAboutDto);
-            _aboutService.TCreate(newAbout);
-            return Ok("Hakkında Oluşturuldu");
+            await _aboutService.TCreateAsync(createAboutDto);
+            return Ok(ApiResponse<object>.SuccessResponse(null, "Hakkında oluşturuldu."));
         }
 
         [HttpPut]
-        public IActionResult Update(UpdateAboutDto updateAboutDto)
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Update(UpdateAboutDto updateAboutDto)
         {
-            var existingAbout = _mapper.Map<About>(updateAboutDto);
-            _aboutService.TUpdate(existingAbout);
-            return Ok("Hakkında Bilgisi Güncellendi");
+            await _aboutService.TUpdateAsync(updateAboutDto);
+            return Ok(ApiResponse<object>.SuccessResponse(null, "Hakkında güncellendi."));
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Delete(int id)
+        {
+            await _aboutService.TDeleteAsync(id);
+            return Ok(ApiResponse<object>.SuccessResponse(null, "Hakkında silindi."));
         }
     }
 }

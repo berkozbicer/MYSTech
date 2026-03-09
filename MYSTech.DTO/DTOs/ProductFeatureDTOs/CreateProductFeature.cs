@@ -5,12 +5,10 @@ using System.Text;
 
 namespace MYSTech.DTO.DTOs.ProductFeatureDTOs
 {
-    public class CreateProductFeature
+    public class CreateProductFeatureDto
     {
         public int ProductId { get; set; }
         public string Key { get; set; }
         public string Value { get; set; }
-
-        public Product Product { get; set; }
     }
 }

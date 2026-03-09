@@ -5,24 +5,17 @@ using System.Text;
 
 namespace MYSTech.Business.Abstract
 {
-    public interface IGenericService<T> where T : class
+    public interface IGenericService<TEntity, TResultDto, TCreateDto, TUpdateDto>
+        where TEntity : class
     {
-        List<T> TGetList();
-
-        T TGetByFilter(Expression<Func<T, bool>> predicate);
-
-        T TGetById(int id);
-
-        void TCreate(T entity);
-
-        void TUpdate(T entity);
-
-        void TDelete(int id);
-
-        int TCount();
-
-        int TFilteredCount(Expression<Func<T, bool>> predicate); // Filtrelenmiş kayıt sayısı alma metodu
-
-        List<T> TGetFilteredList(Expression<Func<T, bool>> predicate); // Filtrelenmiş liste alma metodu
+        Task<List<TResultDto>> TGetListAsync();
+        Task<TResultDto> TGetByIdAsync(int id);
+        Task<TResultDto> TGetByFilterAsync(Expression<Func<TEntity, bool>> predicate);
+        Task<List<TResultDto>> TGetFilteredListAsync(Expression<Func<TEntity, bool>> predicate);
+        Task TCreateAsync(TCreateDto dto);
+        Task TUpdateAsync(TUpdateDto dto);
+        Task TDeleteAsync(int id);
+        Task<int> TCountAsync();
+        Task<int> TFilteredCountAsync(Expression<Func<TEntity, bool>> predicate);
     }
 }

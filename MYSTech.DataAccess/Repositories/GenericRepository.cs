@@ -11,60 +11,54 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MYSTech.DataAccess.Repositories
 {
-    public class GenericRepository<T>(MYSTechContext _context) : IRepository<T> where T : class
+    public class GenericRepository<T> : IRepository<T> where T : class
     {
-        public DbSet<T> Table { get => _context.Set<T>(); } // Veritabanındaki ilgili tabloya erişim sağlayan DbSet
+        private readonly MYSTechContext _context;
+        public DbSet<T> Table => _context.Set<T>();
 
-        public int Count()
+        public GenericRepository(MYSTechContext context)
         {
-            return Table.Count();
+            _context = context;
         }
 
-        public void Create(T entity)
+        public async Task<List<T>> GetListAsync()
+            => await Table.ToListAsync();
+
+        public async Task<T> GetByIdAsync(int id)
+            => await Table.FindAsync(id);
+
+        public async Task<T> GetByFilterAsync(Expression<Func<T, bool>> predicate)
+            => await Table.Where(predicate).FirstOrDefaultAsync();
+
+        public async Task<List<T>> GetFilteredListAsync(Expression<Func<T, bool>> predicate)
+            => await Table.Where(predicate).ToListAsync();
+
+        public async Task CreateAsync(T entity)
         {
-            Table.Add(entity);
-            _context.SaveChanges();
+            await Table.AddAsync(entity);
+            await _context.SaveChangesAsync();
         }
 
-        public void Delete(int id)
+        public async Task UpdateAsync(T entity)
         {
-            var entity = Table.Find(id);
+            Table.Update(entity);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            var entity = await Table.FindAsync(id);
             if (entity != null)
             {
                 Table.Remove(entity);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
         }
 
-        public int FilteredCount(Expression<Func<T, bool>> predicate)
-        {
-            return Table.Where(predicate).Count();
-        }
+        public async Task<int> CountAsync()
+            => await Table.CountAsync();
 
-        public List<T> GetList()
-        {
-            return Table.ToList();
-        }
-
-        public T GetByFilter(Expression<Func<T, bool>> predicate)
-        {
-            return Table.Where(predicate).FirstOrDefault(); // Verilen filtreye uyan ilk kaydı döndürür, eğer yoksa null döner
-        }
-
-        public T GetById(int id)
-        {
-            return Table.Find(id);
-        }
-
-        public List<T> GetFilteredList(Expression<Func<T, bool>> predicate)
-        {
-            return Table.Where(predicate).ToList(); // Verilen filtreye uyan tüm kayıtları liste olarak döndürür
-        }
-
-        public void Update(T entity)
-        {
-            Table.Update(entity);
-            _context.SaveChanges();
-        }
+        public async Task<int> FilteredCountAsync(Expression<Func<T, bool>> predicate)
+            => await Table.Where(predicate).CountAsync();
     }
 }

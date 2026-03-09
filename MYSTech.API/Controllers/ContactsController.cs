@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MYSTech.API.Models;
 using MYSTech.Business.Abstract;
 using MYSTech.DTO.DTOs.BannerDTOs;
 using MYSTech.DTO.DTOs.ContactDTOs;
@@ -10,47 +12,58 @@ namespace MYSTech.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ContactsController(IGenericService<Contact> _contactService, IMapper _mapper) : ControllerBase
+    [Produces("application/json")]
+    public class ContactsController(IContactService _contactService) : ControllerBase
     {
         [HttpGet]
-        public IActionResult Get()
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(ApiResponse<List<ResultContactDto>>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetList()
         {
-            var contacts = _contactService.TGetList();
-            return Ok(contacts);
+            var contacts = await _contactService.TGetListAsync();
+            return Ok(ApiResponse<List<ResultContactDto>>.SuccessResponse(contacts));
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(ApiResponse<ResultContactDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetById(int id)
         {
-            var contact = _contactService.TGetById(id);
+            var contact = await _contactService.TGetByIdAsync(id);
             if (contact == null)
-            {
-                return NotFound();
-            }
-            return Ok(contact);
-        }
-
-        [HttpDelete]
-        public IActionResult Delete(int id)
-        {
-            _contactService.TDelete(id);
-            return Ok("İletiim Alanı Silindi");
+                return NotFound(ApiResponse<object>.FailResponse("Kayıt bulunamadı."));
+            return Ok(ApiResponse<ResultContactDto>.SuccessResponse(contact));
         }
 
         [HttpPost]
-        public IActionResult Create(CreateContactDto createContactDto)
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Create(CreateContactDto createContactDto)
         {
-            var newContact = _mapper.Map<Contact>(createContactDto);
-            _contactService.TCreate(newContact);
-            return Ok("İletişim Alanı Oluşturuldu");
+            await _contactService.TCreateAsync(createContactDto);
+            return Ok(ApiResponse<object>.SuccessResponse(null, "İletişim mesajı gönderildi."));
         }
 
         [HttpPut]
-        public IActionResult Update(UpdateContactDto updateContactDto)
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Update(UpdateContactDto updateContactDto)
         {
-            var existingContact = _mapper.Map<Contact>(updateContactDto);
-            _contactService.TUpdate(existingContact);
-            return Ok("İletişim Alanı Güncellendi");
+            await _contactService.TUpdateAsync(updateContactDto);
+            return Ok(ApiResponse<object>.SuccessResponse(null, "İletişim alanı güncellendi."));
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Delete(int id)
+        {
+            await _contactService.TDeleteAsync(id);
+            return Ok(ApiResponse<object>.SuccessResponse(null, "İletişim alanı silindi."));
         }
     }
 }

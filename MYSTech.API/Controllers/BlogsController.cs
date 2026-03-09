@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MYSTech.API.Models;
 using MYSTech.Business.Abstract;
 using MYSTech.DTO.DTOs.BannerDTOs;
 using MYSTech.DTO.DTOs.BlogDTOs;
@@ -10,47 +12,100 @@ namespace MYSTech.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class BlogsController(IGenericService<Blog> _blogService, IMapper _mapper) : ControllerBase
+    [Produces("application/json")]
+    public class BlogsController(IBlogService _blogService) : ControllerBase
     {
         [HttpGet]
-        public IActionResult Get()
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(ApiResponse<List<ResultBlogListDto>>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetList()
         {
-            var blogs = _blogService.TGetList();
-            return Ok(blogs);
+            var blogs = await _blogService.TGetListAsync();
+            return Ok(ApiResponse<List<ResultBlogListDto>>.SuccessResponse(blogs));
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(ApiResponse<ResultBlogListDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetById(int id)
         {
-            var blog = _blogService.TGetById(id);
+            var blog = await _blogService.TGetByIdAsync(id);
             if (blog == null)
-            {
-                return NotFound();
-            }
-            return Ok(blog);
+                return NotFound(ApiResponse<object>.FailResponse("Kayıt bulunamadı."));
+            return Ok(ApiResponse<ResultBlogListDto>.SuccessResponse(blog));
         }
 
-        [HttpDelete]
-        public IActionResult Delete(int id)
+        [HttpGet("{id}/detail")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(ApiResponse<ResultBlogDetailDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetDetail(int id)
         {
-            _blogService.TDelete(id);
-            return Ok("Blog Silindi");
+            var blog = await _blogService.TGetDetailAsync(id);
+            if (blog == null)
+                return NotFound(ApiResponse<object>.FailResponse("Kayıt bulunamadı."));
+            return Ok(ApiResponse<ResultBlogDetailDto>.SuccessResponse(blog));
+        }
+
+        [HttpGet("slug/{slug}")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(ApiResponse<ResultBlogDetailDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetBySlug(string slug)
+        {
+            var blog = await _blogService.TGetDetailBySlugAsync(slug);
+            if (blog == null)
+                return NotFound(ApiResponse<object>.FailResponse("Kayıt bulunamadı."));
+            return Ok(ApiResponse<ResultBlogDetailDto>.SuccessResponse(blog));
+        }
+
+        [HttpGet("published")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(ApiResponse<List<ResultBlogListDto>>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetPublished()
+        {
+            var blogs = await _blogService.TGetPublishedBlogsAsync();
+            return Ok(ApiResponse<List<ResultBlogListDto>>.SuccessResponse(blogs));
+        }
+
+        [HttpGet("category/{categoryId}")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(ApiResponse<List<ResultBlogListDto>>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetByCategory(int categoryId)
+        {
+            var blogs = await _blogService.TGetBlogsByCategoryAsync(categoryId);
+            return Ok(ApiResponse<List<ResultBlogListDto>>.SuccessResponse(blogs));
         }
 
         [HttpPost]
-        public IActionResult Create(CreateBlogDto createBlogDto)
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Create(CreateBlogDto createBlogDto)
         {
-            var newBlog = _mapper.Map<Blog>(createBlogDto);
-            _blogService.TCreate(newBlog);
-            return Ok("Blog Oluşturuldu");
+            await _blogService.TCreateAsync(createBlogDto);
+            return Ok(ApiResponse<object>.SuccessResponse(null, "Blog oluşturuldu."));
         }
 
         [HttpPut]
-        public IActionResult Update(UpdateBlogDto updateBlogDto)
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Update(UpdateBlogDto updateBlogDto)
         {
-            var existingBlog = _mapper.Map<Blog>(updateBlogDto);
-            _blogService.TUpdate(existingBlog);
-            return Ok("Blog Güncellendi");
+            await _blogService.TUpdateAsync(updateBlogDto);
+            return Ok(ApiResponse<object>.SuccessResponse(null, "Blog güncellendi."));
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Delete(int id)
+        {
+            await _blogService.TDeleteAsync(id);
+            return Ok(ApiResponse<object>.SuccessResponse(null, "Blog silindi."));
         }
     }
 }

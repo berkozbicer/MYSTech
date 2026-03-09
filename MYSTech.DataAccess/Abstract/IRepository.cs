@@ -7,22 +7,14 @@ namespace MYSTech.DataAccess.Abstract
 {
     public interface IRepository<T> where T : class
     {
-        List<T> GetList();
-
-        T GetByFilter(Expression<Func<T, bool>> predicate);
-
-        T GetById(int id);
-
-        void Create(T entity);
-
-        void Update(T entity);
-
-        void Delete(int id);
-
-        int Count();
-
-        int FilteredCount(Expression<Func<T, bool>> predicate); // Filtrelenmiş kayıt sayısı alma metodu
-
-        List<T> GetFilteredList(Expression<Func<T, bool>> predicate); // Filtrelenmiş liste alma metodu
+        Task<List<T>> GetListAsync();
+        Task<T> GetByFilterAsync(Expression<Func<T, bool>> predicate);
+        Task<T> GetByIdAsync(int id);
+        Task<List<T>> GetFilteredListAsync(Expression<Func<T, bool>> predicate);
+        Task CreateAsync(T entity);
+        Task UpdateAsync(T entity);
+        Task DeleteAsync(int id);
+        Task<int> CountAsync();
+        Task<int> FilteredCountAsync(Expression<Func<T, bool>> predicate);
     }
 }

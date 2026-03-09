@@ -1,13 +1,16 @@
 ﻿using AutoMapper;
+using MYSTech.DTO.DTOs.AboutDTOs;
+using MYSTech.Entity.Entities;
 
 namespace MYSTech.API.Mapping
 {
     public class AboutMapping : Profile
     {
-        public AboutMapping() 
+        public AboutMapping()
         {
-            CreateMap<Entity.Entities.About, DTO.DTOs.AboutDTOs.CreateAboutDto>().ReverseMap();
-            CreateMap<Entity.Entities.About, DTO.DTOs.AboutDTOs.UpdateAboutDto>().ReverseMap();
+            CreateMap<About, ResultAboutDto>().ReverseMap();
+            CreateMap<CreateAboutDto, About>().ReverseMap();
+            CreateMap<UpdateAboutDto, About>().ReverseMap();
         }
     }
 }

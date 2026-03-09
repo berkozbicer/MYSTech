@@ -1,61 +1,75 @@
-﻿using MYSTech.Business.Abstract;
+﻿using AutoMapper;
+using MYSTech.Business.Abstract;
 using MYSTech.DataAccess.Abstract;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace MYSTech.Business.Concrete
 {
-    public class GenericManager<T>(IRepository<T> _repository) : IGenericService<T> where T : class
+    public class GenericManager<TEntity, TResultDto, TCreateDto, TUpdateDto>
+        : IGenericService<TEntity, TResultDto, TCreateDto, TUpdateDto>
+        where TEntity : class
     {
-        public int TCount()
+        private readonly IRepository<TEntity> _repository;
+        protected readonly IMapper _mapper;
+
+        public GenericManager(IRepository<TEntity> repository, IMapper mapper)
         {
-            return _repository.Count();
+            _repository = repository;
+            _mapper = mapper;
         }
 
-        public void TCreate(T entity)
+        public async Task<List<TResultDto>> TGetListAsync()
         {
-            _repository.Create(entity);
+            var entities = await _repository.GetListAsync();
+            return _mapper.Map<List<TResultDto>>(entities);
         }
 
-        public void TDelete(int id)
+        public async Task<TResultDto> TGetByIdAsync(int id)
         {
-            _repository.Delete(id);
+            var entity = await _repository.GetByIdAsync(id);
+            return _mapper.Map<TResultDto>(entity);
         }
 
-        public int TFilteredCount(System.Linq.Expressions.Expression<Func<T, bool>> predicate)
+        public async Task<TResultDto> TGetByFilterAsync(Expression<Func<TEntity, bool>> predicate)
         {
-            return _repository.FilteredCount(predicate);
+            var entity = await _repository.GetByFilterAsync(predicate);
+            return _mapper.Map<TResultDto>(entity);
         }
 
-        public List<T> TGetAll()
+        public async Task<List<TResultDto>> TGetFilteredListAsync(Expression<Func<TEntity, bool>> predicate)
         {
-            return _repository.GetList();
+            var entities = await _repository.GetFilteredListAsync(predicate);
+            return _mapper.Map<List<TResultDto>>(entities);
         }
 
-        public T TGetByFilter(System.Linq.Expressions.Expression<Func<T, bool>> predicate)
+        public async Task TCreateAsync(TCreateDto dto)
         {
-            return _repository.GetByFilter(predicate);
+            var entity = _mapper.Map<TEntity>(dto);
+            await _repository.CreateAsync(entity);
         }
 
-        public T TGetById(int id)
+        public async Task TUpdateAsync(TUpdateDto dto)
         {
-            return _repository.GetById(id);
+            var entity = _mapper.Map<TEntity>(dto);
+            await _repository.UpdateAsync(entity);
         }
 
-        public List<T> TGetFilteredList(System.Linq.Expressions.Expression<Func<T, bool>> predicate)
+        public async Task TDeleteAsync(int id)
         {
-            return _repository.GetFilteredList(predicate);
+            await _repository.DeleteAsync(id);
         }
 
-        public List<T> TGetList()
+        public async Task<int> TCountAsync()
         {
-            return _repository.GetList();
+            return await _repository.CountAsync();
         }
 
-        public void TUpdate(T entity)
+        public async Task<int> TFilteredCountAsync(Expression<Func<TEntity, bool>> predicate)
         {
-            _repository.Update(entity);
+            return await _repository.FilteredCountAsync(predicate);
         }
     }
 }

@@ -8,8 +8,9 @@ namespace MYSTech.API.Mapping
     {
         public BannerMapping()
         {
-            CreateMap<CreateBannerDto, Banner>().ReverseMap();
-            CreateMap<UpdateBannerDto, Banner>().ReverseMap();
+            CreateMap<Banner, ResultBannerDto>();
+            CreateMap<CreateBannerDto, Banner>();
+            CreateMap<UpdateBannerDto, Banner>();
         }
     }
 }
