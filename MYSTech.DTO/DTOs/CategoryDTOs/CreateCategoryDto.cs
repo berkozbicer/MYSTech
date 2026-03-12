@@ -1,5 +1,4 @@
-﻿using MYSTech.Entity.Entities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -24,10 +23,10 @@ namespace MYSTech.DTO.DTOs.CategoryDTOs
 
         public int? ParentCategoryId { get; set; }
 
-        public Category ParentCategory { get; set; }
+        //public Category ParentCategory { get; set; }
 
-        public ICollection<Category> SubCategories { get; set; }
+        //public ICollection<Category> SubCategories { get; set; }
 
-        public ICollection<Product> Products { get; set; }
+        //public ICollection<Product> Products { get; set; }
     }
 }

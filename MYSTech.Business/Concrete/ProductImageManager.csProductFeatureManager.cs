@@ -28,7 +28,6 @@ namespace MYSTech.Business.Concrete
 
         public async Task TSetMainImageAsync(int productImageId)
         {
-            // Önce aynı ürünün tüm görsellerinin IsMain'ini false yap
             var image = await _productImageRepository.GetByIdAsync(productImageId);
             var allImages = await _productImageRepository.GetFilteredListAsync(x => x.ProductId == image.ProductId);
             foreach (var img in allImages)
@@ -36,7 +35,6 @@ namespace MYSTech.Business.Concrete
                 img.IsMain = false;
                 await _productImageRepository.UpdateAsync(img);
             }
-            // Seçileni main yap
             image.IsMain = true;
             await _productImageRepository.UpdateAsync(image);
         }

@@ -21,6 +21,7 @@ namespace MYSTech.DataAccess.Context
         public DbSet<ProductImage> ProductImages { get; set; }
         public DbSet<SocialMedia> SocialMedias { get; set; }
         public DbSet<Testimonial> Testimonials { get; set; }
+        public DbSet<Project> Projects { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -7,8 +7,15 @@ namespace MYSTech.Entity.Entities
     public class Contact : BaseEntity
     {
         public int ContactId { get; set; }
+
+        public string FullName { get; set; }
+
         public string Email { get; set; }
+
+        public string? Phone { get; set; }
+
+        public string Subject { get; set; }
+
         public string Message { get; set; }
-        public string Address { get; set; }
     }
 }

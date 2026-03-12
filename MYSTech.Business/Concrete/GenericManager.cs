@@ -53,7 +53,17 @@ namespace MYSTech.Business.Concrete
 
         public async Task TUpdateAsync(TUpdateDto dto)
         {
-            var entity = _mapper.Map<TEntity>(dto);
+            var idProperty = typeof(TUpdateDto).GetProperty("Id")
+                  ?? typeof(TUpdateDto).GetProperty(typeof(TEntity).Name + "Id");
+
+            if (idProperty == null) throw new InvalidOperationException($"{typeof(TUpdateDto).Name} içinde Id property'si bulunamadı.");
+
+            var id = (int)idProperty.GetValue(dto)!;
+
+            var entity = await _repository.GetByIdAsync(id);
+            if (entity == null) throw new KeyNotFoundException("Kayıt bulunamadı.");
+
+            _mapper.Map(dto, entity);
             await _repository.UpdateAsync(entity);
         }
 

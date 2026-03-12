@@ -59,6 +59,7 @@ builder.Services.AddScoped<IBlogCategoryRepository, BlogCategoryRepository>();
 builder.Services.AddScoped<IBlogRepository, BlogRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 
 // ── Services ───────────────────────────────────────────────────────────────
 builder.Services.AddScoped<IAboutService, AboutManager>();
@@ -73,6 +74,7 @@ builder.Services.AddScoped<IProductFeatureService, ProductFeatureManager>();
 builder.Services.AddScoped<ISocialMediaService, SocialMediaManager>();
 builder.Services.AddScoped<ITestimonialService, TestimonialManager>();
 builder.Services.AddScoped<ITokenService, TokenManager>();
+builder.Services.AddScoped<IProjectService, ProjectManager>();
 
 // ── Controllers + ValidationFilter ────────────────────────────────────────
 builder.Services.AddControllers(options =>

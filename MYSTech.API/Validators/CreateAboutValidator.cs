@@ -7,13 +7,17 @@ namespace MYSTech.API.Validators
     {
         public CreateAboutValidator()
         {
-            RuleFor(x => x.Description)
-                .NotEmpty().WithMessage("Açıklama boş olamaz.")
-                .MaximumLength(2000).WithMessage("Açıklama en fazla 2000 karakter olabilir.");
+            RuleFor(x => x.Title)
+                .NotEmpty().WithMessage("Başlık boş olamaz.")
+                .MaximumLength(300).WithMessage("Başlık en fazla 300 karakter olabilir.");
+
+            RuleFor(x => x.Content)
+                .NotEmpty().WithMessage("İçerik boş olamaz.")
+                .MaximumLength(2000).WithMessage("İçerik en fazla 2000 karakter olabilir.");
 
             RuleFor(x => x.ImageUrl)
-                .NotEmpty().WithMessage("Görsel URL boş olamaz.")
-                .MaximumLength(500).WithMessage("Görsel URL en fazla 500 karakter olabilir.");
+                .MaximumLength(500).WithMessage("Görsel URL en fazla 500 karakter olabilir.")
+                .When(x => x.ImageUrl != null);
         }
     }
 }

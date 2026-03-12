@@ -16,40 +16,31 @@ namespace MYSTech.DataAccess.Configurations
             builder.Property(a => a.AboutId)
                 .ValueGeneratedOnAdd();
 
-            builder.Property(a => a.Description)
+            builder.Property(a => a.Title)
+                .IsRequired()
+                .HasMaxLength(300);
+
+            builder.Property(a => a.Content)
                 .IsRequired()
                 .HasMaxLength(2000);
 
             builder.Property(a => a.ImageUrl)
-                .IsRequired()
                 .HasMaxLength(500);
 
-            // BaseEntity fields
-            builder.Property(a => a.CreatedDate)
-                .IsRequired();
-
-            builder.Property(a => a.CreatedBy)
-                .HasMaxLength(100);
-
-            builder.Property(a => a.UpdatedDate);
-
-            builder.Property(a => a.UpdatedBy)
-                .HasMaxLength(100);
-
-            builder.Property(a => a.IsDeleted)
+            builder.Property(a => a.IsActive)
                 .IsRequired()
-                .HasDefaultValue(false);
+                .HasDefaultValue(true);
 
+            builder.Property(a => a.CreatedDate).IsRequired();
+            builder.Property(a => a.CreatedBy).HasMaxLength(100);
+            builder.Property(a => a.UpdatedDate);
+            builder.Property(a => a.UpdatedBy).HasMaxLength(100);
+            builder.Property(a => a.IsDeleted).IsRequired().HasDefaultValue(false);
             builder.Property(a => a.DeletedDate);
-
-            builder.Property(a => a.DeletedBy)
-                .HasMaxLength(100);
-
-            builder.Property(a => a.RowVersion)
-                .IsRowVersion();
+            builder.Property(a => a.DeletedBy).HasMaxLength(100);
+            builder.Property(a => a.RowVersion).IsRowVersion();
 
             builder.HasQueryFilter(a => !a.IsDeleted);
-
             builder.ToTable("Abouts");
         }
     }
