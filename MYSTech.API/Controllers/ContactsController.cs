@@ -7,12 +7,14 @@ using MYSTech.Business.Abstract;
 using MYSTech.DTO.DTOs.BannerDTOs;
 using MYSTech.DTO.DTOs.ContactDTOs;
 using MYSTech.Entity.Entities;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace MYSTech.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     [Produces("application/json")]
+    [EnableRateLimiting("GeneralPolicy")]
     public class ContactsController(IContactService _contactService) : ControllerBase
     {
         [HttpGet]
@@ -38,6 +40,7 @@ namespace MYSTech.API.Controllers
 
         [HttpPost]
         [AllowAnonymous]
+        [EnableRateLimiting("ContactFormPolicy")]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create(CreateContactDto createContactDto)

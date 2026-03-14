@@ -4,5 +4,4 @@
   <Project Path="MYSTech.DataAccess/MYSTech.DataAccess.csproj" />
   <Project Path="MYSTech.DTO/MYSTech.DTO.csproj" />
   <Project Path="MYSTech.Entity/MYSTech.Entity.csproj" />
-  <Project Path="MYSTech.WebUI/MYSTech.WebUI.csproj" />
 </Solution>
