@@ -64,7 +64,7 @@ namespace MYSTech.API.Controllers
             return Ok(ApiResponse<object>.SuccessResponse(null, "Banner oluşturuldu."));
         }
 
-        [HttpPut]
+        [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
